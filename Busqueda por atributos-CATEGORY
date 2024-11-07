@@ -1,0 +1,50 @@
+import pandas as pd
+
+# Cargar el archivo Excel
+df = pd.read_excel('EMPRESAS PARTICIPANTES SUPERCORR24.xlsx', sheet_name='Hoja1')
+
+# Definir las categorías y palabras clave
+categories = {
+    'Paper Manufacturers': ['Paper', 'Pulp'],
+    'Carton Manufacturers': ['Carton', 'Box'],
+    'Corrugated Box Manufacturers': ['Corrugated', 'Box'],
+    'Packaging Manufacturers': ['Packaging', 'Pack'],
+    'Paper Roll Manufacturers': ['Roll', 'Paper'],
+    'Coated Paper Manufacturers': ['Coated', 'Paper'],
+    'Carton Packaging Manufacturers': ['Carton', 'Packaging'],
+    'Paper Tube and Core Manufacturers': ['Tube', 'Core'],
+    'Packaging Machinery Suppliers': ['Machinery', 'Equipment'],
+    'Packaging Materials Suppliers': ['Materials', 'Supplies'],
+    'Paper and Carton Recycling Companies': ['Recycling', 'Recycle'],
+    'Packaging Design and Consulting Services': ['Design', 'Consulting'],
+    'Industrial Printing Equipment Manufacturers': ['Printing', 'Print'],
+    'Industrial Coating Equipment Manufacturers': ['Coating', 'Coat'],
+    'Industrial Extrusion Equipment Manufacturers': ['Extrusion', 'Extrude'],
+    'Industrial Corrugating Equipment Manufacturers': ['Corrugating', 'Corrugate'],
+    'Material Handling Equipment Manufacturers': ['Material Handling', 'Handling'],
+    'Automation Equipment Manufacturers': ['Automation', 'Automate'],
+    'Flexible Packaging Manufacturers': ['Flexible', 'Flex'],
+    'Label and Tag Manufacturers': ['Label', 'Tag'],
+    'Folding Carton Manufacturers': ['Folding Carton', 'Fold'],
+    'Rigid Box Manufacturers': ['Rigid Box', 'Rigid'],
+    'Specialty Paper Manufacturers': ['Specialty Paper', 'Specialty'],
+    'Paper Converting Equipment Suppliers': ['Converting', 'Convert'],
+    'Adhesive and Sealant Suppliers': ['Adhesive', 'Sealant'],
+    'Packaging Film Manufacturers': ['Film', 'Wrap'],
+    'Sustainable Packaging Solutions Providers': ['Sustainable', 'Eco'],
+    'Protective Packaging Manufacturers': ['Protective', 'Protect'],
+    'Custom Packaging Solutions Providers': ['Custom', 'Custom Packaging']
+}
+
+# Función para clasificar empresas
+def classify_company(name):
+    for category, keywords in categories.items():
+        if any(keyword.lower() in name.lower() for keyword in keywords):
+            return category
+    return 'Other'
+
+# Aplicar la clasificación
+df['Category'] = df['Company Name'].apply(classify_company)
+
+# Guardar el resultado en un nuevo archivo Excel
+df.to_excel('Classified_Companies.xlsx', index=False)
