@@ -4,9 +4,13 @@ from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
+import os
 
-# Cargar el archivo Excel
-df = pd.read_excel(r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Documentos\IÑAKI SENAR\COMERCIAL\PROSPECCION\EMPRESAS PARTICIPANTES SUPERCORR24tabla limpia solo nombres.xlsx', sheet_name='Hoja1')
+# Cargar el archivo Excel sin encabezados
+df = pd.read_excel(r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Documentos\IÑAKI SENAR\COMERCIAL\PROSPECCION\EMPRESAS PARTICIPANTES SUPERCORR24tabla limpia solo nombres.xlsx', sheet_name='Hoja1', header=None)
+
+# Asignar un nombre a la columna de clientes
+df.columns = ['Nombre_de_la_empresa']
 
 # Crear una nueva columna para almacenar el estado de USA de la sede central
 df['Headquarters Location'] = ''
@@ -39,11 +43,15 @@ def get_headquarters_state(company_name):
 for index, row in df.iterrows():
     company_name = row['Nombre_de_la_empresa']  # Asegúrate de que el nombre de la columna sea correcto
     state = get_headquarters_state(company_name)
-    df.at(index, 'Headquarters Location'] = state
+    df.at[index, 'Headquarters Location'] = state
 
 # Guardar el resultado en un nuevo archivo Excel
 output_path = r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Documentos\IÑAKI SENAR\COMERCIAL\PROSPECCION\Resultados_Headquarters_Location.xlsx'
-df.to_excel(output_path, index=False)
+try:
+    df.to_excel(output_path, index=False)
+    print(f"Archivo Excel guardado exitosamente en {output_path}")
+except Exception as e:
+    print(f"Error al guardar el archivo Excel: {e}")
 
 # Cerrar el navegador
 driver.quit()
