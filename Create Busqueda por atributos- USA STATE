@@ -1,0 +1,49 @@
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+
+# Cargar el archivo Excel
+df = pd.read_excel(r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Documentos\IÑAKI SENAR\COMERCIAL\PROSPECCION\EMPRESAS PARTICIPANTES SUPERCORR24tabla limpia solo nombres.xlsx', sheet_name='Hoja1')
+
+# Crear una nueva columna para almacenar el estado de USA de la sede central
+df['Headquarters Location'] = ''
+
+# Configuración de Selenium
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')
+driver_path = 'ruta_a_chromedriver.exe'  # Ajusta la ruta a Chromedriver
+driver = webdriver.Chrome(executable_path=driver_path, options=options)
+
+# Función para buscar el estado de la sede central
+def get_headquarters_state(company_name):
+    search_query = f"{company_name} headquarters location"
+    driver.get("https://www.google.com")
+    search_box = driver.find_element(By.NAME, "q")
+    search_box.send_keys(search_query + Keys.RETURN)
+    time.sleep(2)  # Esperar a que la página cargue
+    
+    try:
+        # Extraer el primer resultado que contenga el estado
+        result = driver.find_element(By.XPATH, "//div[contains(text(), 'Headquarters') or contains(text(), 'Location')]").text
+        # Aquí puedes procesar el texto para extraer solo el estado, si es necesario
+        return result
+    except Exception as e:
+        print(f"No se encontró información para {company_name}")
+        return "No disponible"
+
+# Recorrer cada empresa y obtener el estado de su sede
+for index, row in df.iterrows():
+    company_name = row['Nombre_de_la_empresa']  # Asegúrate de que el nombre de la columna sea correcto
+    state = get_headquarters_state(company_name)
+    df.at[index, 'Headquarters Location'] = state
+
+# Guardar el resultado en un nuevo archivo Excel
+output_path = r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Documentos\IÑAKI SENAR\COMERCIAL\PROSPECCION\Resultados_Headquarters_Location.xlsx'
+df.to_excel(output_path, index=False)
+
+# Cerrar el navegador
+driver.quit()
+
+print("Proceso completado. El archivo con la ubicación de las sedes se ha guardado.")
