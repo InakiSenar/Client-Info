@@ -1,5 +1,6 @@
 import pandas as pd
 from selenium import webdriver
+from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
@@ -11,10 +12,11 @@ df = pd.read_excel(r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Documen
 df['Headquarters Location'] = ''
 
 # Configuración de Selenium
-options = webdriver.ChromeOptions()
+options = webdriver.EdgeOptions()
 options.add_argument('--headless')
-driver_path = 'ruta_a_chromedriver.exe'  # Ajusta la ruta a Chromedriver
-driver = webdriver.Chrome(executable_path=driver_path, options=options)
+driver_path = r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Escritorio\Nueva carpeta\Edge Driver\msedgedriver.exe'
+service = EdgeService(executable_path=driver_path)
+driver = webdriver.Edge(service=service, options=options)
 
 # Función para buscar el estado de la sede central
 def get_headquarters_state(company_name):
@@ -37,7 +39,7 @@ def get_headquarters_state(company_name):
 for index, row in df.iterrows():
     company_name = row['Nombre_de_la_empresa']  # Asegúrate de que el nombre de la columna sea correcto
     state = get_headquarters_state(company_name)
-    df.at[index, 'Headquarters Location'] = state
+    df.at(index, 'Headquarters Location'] = state
 
 # Guardar el resultado en un nuevo archivo Excel
 output_path = r'D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Documentos\IÑAKI SENAR\COMERCIAL\PROSPECCION\Resultados_Headquarters_Location.xlsx'
