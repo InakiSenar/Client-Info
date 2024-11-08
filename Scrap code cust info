@@ -1,0 +1,76 @@
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+from openpyxl import Workbook
+
+# Ruta del archivo Excel con los nombres de los clientes
+input_file = r"D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Escritorio\Nueva carpeta\EMPRESAS PARTICIPANTES SUPERCORR24reducida.xlsx"
+clientes_df = pd.read_excel(input_file, sheet_name='Hoja1', header=None, names=["Cliente"])
+
+# Configuración del servicio de EdgeDriver
+driver_path = r"D:\OneDrive - M. TORRES DISEÑOS INDUSTRIALES S.A.U\Escritorio\Nueva carpeta\Edge Driver\msedgedriver.exe"
+service = EdgeService(executable_path=driver_path)
+
+# Inicializar el navegador Edge
+options = webdriver.EdgeOptions()
+options.add_argument("start-maximized")
+driver = webdriver.Edge(service=service, options=options)
+
+# Crear un archivo Excel para guardar los resultados
+output_file = 'informacion_clientes.xlsx'
+workbook = Workbook()
+sheet = workbook.active
+# Definir las columnas
+columns = ["Cliente", "Industry", "Headquarters Location", "Main Production Plant",
+           "Number of Employees", "Main Products by Revenue", "Company Strategy",
+           "Customer Objectives", "Customer Demands to Equipment OEMs", "Planned Investments",
+           "Financial Report", "Financial Situation (Revenue, Profits, Growth)", "Latest News"]
+sheet.append(columns)
+
+# Procesar cada cliente
+for cliente in clientes_df['Cliente']:
+    try:
+        # Realizar búsqueda en Google con Selenium
+        driver.get("https://www.google.com/")
+        search_box = driver.find_element(By.NAME, "q")
+        search_query = f"{cliente} company profile"
+        search_box.send_keys(search_query + Keys.RETURN)
+        
+        # Esperar a que se carguen los resultados
+        time.sleep(3)
+
+        # Extraer la información de los resultados (esto es un ejemplo básico)
+        # Puedes ajustar la lógica de scraping según las páginas que desees priorizar
+        info = {
+            "Cliente": cliente,
+            "Industry": "Industry Example",
+            "Headquarters Location": "Headquarters Example",
+            "Main Production Plant": "Production Plant Example",
+            "Number of Employees": "Employees Example",
+            "Main Products by Revenue": "Main Products Example",
+            "Company Strategy": "Strategy Example",
+            "Customer Objectives": "Objectives Example",
+            "Customer Demands to Equipment OEMs": "Demands Example",
+            "Planned Investments": "Investments Example",
+            "Financial Report": "Financial Report Example",
+            "Financial Situation (Revenue, Profits, Growth)": "Financial Situation Example",
+            "Latest News": "Latest News Example"
+        }
+        
+        # Recopilar y guardar en el archivo Excel
+        row = [info[col] for col in columns]
+        sheet.append(row)
+        
+        print(f"Información recopilada para cliente: {cliente}")
+
+    except Exception as e:
+        print(f"Error al procesar cliente {cliente}: {e}")
+        continue
+
+# Cerrar el navegador y guardar el archivo Excel
+driver.quit()
+workbook.save(output_file)
+print("Proceso completado, archivo Excel guardado con la información de clientes.")
